@@ -1,0 +1,1136 @@
+---Creamos el esquema de la práctica
+create schema practicaSQLgriseldavs authorization rbwdbskp; 
+
+---Crear tablas car_KC
+
+--Crear tabla type_plate para fijar el tipo de documento de la matrícula EU o Extranjero 
+
+create table practicasqlgriseldavs.type_plate(
+	id_type_plate varchar(20) not null, --PK
+	type_plate varchar (200) not null,
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.type_plate
+add constraint type_plate_PK primary key (id_type_plate);
+
+--Crear tabla número de matrícula, que incluya el tipo
+create table practicasqlgriseldavs.number_plate(
+	id_number_plate varchar (20) not null, --PK
+	id_type_plate varchar (20) not null, --FK--type_plate--id_type_plate
+	number_plate varchar (200) not null,
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.number_plate
+add constraint number_plate_PK primary key (id_number_plate);
+
+alter table practicasqlgriseldavs.number_plate
+add constraint number_plate_id_type_plate_FK foreign key (id_type_plate)
+references practicasqlgriseldavs.type_plate(id_type_plate);
+
+--Crear tabla color
+
+create table practicasqlgriseldavs.color(
+	id_color varchar (20) not null, --PK
+	color varchar (200) not null,
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.color
+add constraint color_PK primary key (id_color);
+
+--Crear tabla car_KC
+
+create table practicasqlgriseldavs.car_KC(
+	id_car varchar (20) not null, --PK
+	id_number_plate varchar (20) not null, --FK--number_plate--id_number_plate
+	id_color varchar (20) not null, --FK--color--id_color
+	dt_purchase date not null,
+	dt_first_registration date not null,
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.car_KC
+add constraint car_KC_PK primary key (id_car);
+
+alter table practicasqlgriseldavs.car_KC
+add constraint id_number_plate_car_KC_FK foreign key (id_number_plate)
+references practicasqlgriseldavs.number_plate(id_number_plate);
+
+alter table practicasqlgriseldavs.car_KC
+add constraint id_color_car_KC_FK foreign key (id_color)
+references practicasqlgriseldavs.color(id_color);
+
+
+--Crear tablas model_car_KC
+
+--Crear tabla year_production
+
+create table practicasqlgriseldavs.year_production(
+	id_year_production varchar (20) not null, --PK
+	year_production integer not null,
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.year_production
+add constraint year_production_PK primary key (id_year_production);
+
+
+--Crear tabla type_g (referido a tipo de combustible)
+
+create table practicasqlgriseldavs.type_g(
+	id_type_g varchar (20) not null, --PK
+	type_g varchar (200) not null,
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.type_g
+add constraint type_g_PK primary key (id_type_g);
+
+
+--Crear tabla class (referido a gama del coche)
+
+create table practicasqlgriseldavs.class_g(
+	id_class_g varchar (20) not null, --PK
+	class_g varchar (200) not null,
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.class_g
+add constraint class_g_PK primary key (id_class_g);
+
+--Crear tabla automotive_group
+
+create table practicasqlgriseldavs.automotive_group(
+	id_automotive_group  varchar (50) not null, --PK
+	automotive_group varchar (200) not null,
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.automotive_group
+add constraint automotive_group_PK primary key (id_automotive_group);
+
+--Crear tabla make_car
+
+create table practicasqlgriseldavs.make_car (
+	id_make_car varchar (50) not null, --PK
+	make_car varchar (200) not null,
+	id_automotive_group varchar (50) not null, --FK--automotive_group--id_automotive_group 
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.make_car 
+add constraint make_car_PK primary key (id_make_car);
+
+alter table practicasqlgriseldavs.make_car 
+add constraint make_car_FK foreign key (id_automotive_group)
+references practicasqlgriseldavs.automotive_group(id_automotive_group);
+
+
+--Crear tabla model_car
+
+create table practicasqlgriseldavs.model_car (
+	id_model_car varchar (50) not null, --PK
+	model_car varchar (200) not null,
+	id_make_car varchar (50) not null, --FK--make_car--id_make_car
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.model_car
+add constraint model_car_PK primary key (id_model_car);
+
+alter table practicasqlgriseldavs.model_car
+add constraint model_car_FK foreign key (id_make_car)
+references practicasqlgriseldavs.make_car (id_make_car);
+
+--Crear tabla model_car_KC
+
+create table practicasqlgriseldavs.model_car_KC(
+	id_car varchar (20) not null, --PK, FK--car_KC--id_car
+	id_model_car varchar (50) not null, --PK, FK--model_car--id_model_car
+	id_year_production varchar (20) not null, --FK--year_production--id_year_production
+	id_type_g varchar (20) not null, --FK--year_type_g--id_type_g
+	id_class_g varchar (20) not null, --FK--year_type_g--id_class_g
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.model_car_KC
+add constraint model_car_KC_PK primary key (id_car, id_model_car);
+
+alter table practicasqlgriseldavs.model_car_KC
+add constraint model_car_KC_id_car_FK foreign key (id_car)
+references practicasqlgriseldavs.car_KC(id_car);
+
+alter table practicasqlgriseldavs.model_car_KC
+add constraint model_car_KC_id_model_car_FK foreign key (id_model_car)
+references practicasqlgriseldavs.model_car(id_model_car);
+
+alter table practicasqlgriseldavs.model_car_KC
+add constraint model_car_KC_id_year_production_FK foreign key (id_year_production)
+references practicasqlgriseldavs.year_production(id_year_production);
+
+alter table practicasqlgriseldavs.model_car_KC
+add constraint model_car_KC_id_type_g_FK foreign key (id_type_g)
+references practicasqlgriseldavs.type_g(id_type_g);
+
+alter table practicasqlgriseldavs.model_car_KC
+add constraint model_car_KC_id_class_g_FK foreign key (id_class_g)
+references practicasqlgriseldavs.class_g(id_class_g);
+
+--DML
+
+--Cargar datos type_plate
+
+insert into practicasqlgriseldavs.type_plate
+(id_type_plate, type_plate, description)
+values ('TPLATE01', 'EU', '');
+
+insert into practicasqlgriseldavs.type_plate
+(id_type_plate, type_plate, description)
+values ('TPLATE02', 'EXTRA', '');
+
+--Cargar datos numer_plate
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE01', 'TPLATE01', '2024 XYV', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE02', 'TPLATE01', '2556 YHG', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE03', 'TPLATE01', '4567 DFK', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE04', 'TPLATE01', '6795 TGF', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE05', 'TPLATE01', '7869 SOR', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE06', 'TPLATE01', '9485 WPR', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE07', 'TPLATE01', '6859 QPE', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE08', 'TPLATE01', '2546 TRU', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE09', 'TPLATE01', '1245 LKJ', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE10', 'TPLATE01', '6543 WER', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE11', 'TPLATE01', '4146 DSA', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE12', 'TPLATE01', '5685 HVC', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE13', 'TPLATE01', '8630 AED', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE14', 'TPLATE01', '6759 PLÑ', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE15', 'TPLATE01', '9678 IUY', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate,number_plate, description)
+values ('NPLATE16', 'TPLATE01', '7654 FGT', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE17', 'TPLATE01', '9876 DER', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE18', 'TPLATE02', 'L0877', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE19', 'TPLATE02', 'LMP 867', '');
+
+insert into practicasqlgriseldavs.number_plate
+(id_number_plate, id_type_plate, number_plate, description)
+values ('NPLATE20', 'TPLATE02', 'J321', '');
+
+
+--Cargar datos color
+insert into practicasqlgriseldavs.color
+(id_color, color, description)
+values ('1', 'white', '');
+
+insert into practicasqlgriseldavs.color
+(id_color, color, description)
+values ('2', 'red', '');
+
+insert into practicasqlgriseldavs.color
+(id_color, color, description)
+values ('3', 'blue', '');
+
+insert into practicasqlgriseldavs.color
+(id_color, color, description)
+values ('4', 'black', '');
+
+insert into practicasqlgriseldavs.color
+(id_color, color, description)
+values ('5', 'grey', '');
+
+--Cargar datos car_KC
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR01', 'NPLATE01', '1', '2015-05-06', '2015-07-06', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR02', 'NPLATE02', '1', '2015-08-23',	'2015-12-23', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR03', 'NPLATE03', '3', '2019-06-12', '2019-08-12', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR04', 'NPLATE04', '1', '2018-11-04', '2019-01-04', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR05', 'NPLATE05', '1', '2020-08-04', '2020-10-04', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR06', 'NPLATE06', '1', '2020-04-04', '2020-06-04', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR07', 'NPLATE07', '1', '2020-03-04', '2020-07-04', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR08', 'NPLATE08', '5', '2011-06-14', '2011-09-14', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR09', 'NPLATE09', '5', '2011-05-14', '2011-06-14', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR10', 'NPLATE10', '3', '2018-10-20', '2018-11-20', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR11', 'NPLATE11', '1', '2015-03-05', '2015-04-05', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR12', 'NPLATE12', '1', '2015-06-10', '2015-09-10', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR13', 'NPLATE13', '5', '2019-04-25', '2019-05-25', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR14', 'NPLATE14', '2', '2018-08-16', '2018-10-16', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR15', 'NPLATE15', '2', '2021-11-18', '2021-12-18', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR16', 'NPLATE16', '3', '2018-06-25', '2018-07-25', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR17', 'NPLATE17', '3', '2022-10-10', '2022-11-10', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR18', 'NPLATE18', '4', '2020-08-17', '2020-09-17', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR19', 'NPLATE19', '4', '2017-06-15', '2017-08-15', '');
+
+insert into practicasqlgriseldavs.car_KC
+(id_car, id_number_plate, id_color, dt_purchase, dt_first_registration, description)
+values('ICAR20', 'NPLATE20', '4', '2017-05-14', '2017-06-14', '');
+
+
+--Cargar datos year_production
+
+insert into practicasqlgriseldavs.year_production
+(id_year_production, year_production, description)
+values('YP01', 2011, '');
+
+insert into practicasqlgriseldavs.year_production
+(id_year_production, year_production, description)
+values('YP02', 2015, '');
+
+insert into practicasqlgriseldavs.year_production
+(id_year_production, year_production, description)
+values('YP03', 2017, '');
+
+insert into practicasqlgriseldavs.year_production
+(id_year_production, year_production, description)
+values('YP04', 2018, '');
+
+insert into practicasqlgriseldavs.year_production
+(id_year_production, year_production, description)
+values('YP05', 2019, '');
+
+insert into practicasqlgriseldavs.year_production
+(id_year_production, year_production, description)
+values('YP06', 2020, '');
+
+insert into practicasqlgriseldavs.year_production
+(id_year_production, year_production, description)
+values('YP07', 2021, '');
+
+insert into practicasqlgriseldavs.year_production
+(id_year_production, year_production, description)
+values('YP09', 2022, '');
+
+--Cargar datos type_g
+
+insert into practicasqlgriseldavs.type_g
+(id_type_g, type_g, description)
+values('TYPE01', 'FUEL', '');
+insert into practicasqlgriseldavs.type_g
+(id_type_g, type_g, description)
+values('TYPE02', 'DIESEL', '');
+insert into practicasqlgriseldavs.type_g
+(id_type_g, type_g, description)
+values('TYPE03', 'ECO', '');
+insert into practicasqlgriseldavs.type_g
+(id_type_g, type_g, description)
+values('TYPE04', 'ECO-FUEL', '');
+
+--Cargar datos class_g
+
+insert into practicasqlgriseldavs.class_g
+(id_class_g , class_g, description)
+values('CLS01', 'STANDARD', '');
+insert into practicasqlgriseldavs.class_g
+(id_class_g , class_g, description)
+values('CLS02', 'SPORT', '');
+insert into practicasqlgriseldavs.class_g
+(id_class_g , class_g, description)
+values('CLS03', 'PREMIUM', '');
+
+--Cargar datos automotive_group
+insert into practicasqlgriseldavs.automotive_group
+(id_automotive_group, automotive_group, description)
+values('AG01', 'ALIANZA RNM', '');
+
+insert into practicasqlgriseldavs.automotive_group
+(id_automotive_group, automotive_group, description)
+values('AG02', 'TOYOTA CORPORATION', '');
+
+insert into practicasqlgriseldavs.automotive_group
+(id_automotive_group, automotive_group, description)
+values('AG03', 'PSAFCA', '');
+
+insert into practicasqlgriseldavs.automotive_group
+(id_automotive_group, automotive_group, description)
+values('AG04', 'BMW GROUP', '');
+
+insert into practicasqlgriseldavs.automotive_group
+(id_automotive_group, automotive_group, description)
+values('AG05', 'TESLA INC', '');
+
+insert into practicasqlgriseldavs.automotive_group
+(id_automotive_group, automotive_group, description)
+values('AG06', 'TATA GROUP', '');
+
+--Cargar datos make_car
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC01', 'RENAULT ', 'AG01', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC02', 'NISSAN', 'AG01', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC03', 'DACIA', 'AG01', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC04', 'TOYOTA', 'AG02', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC05', 'LEXUS', 'AG02', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC06', 'PEUGEOT ', 'AG03', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC07', 'CITROËN', 'AG03', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC08', 'FIAT', 'AG03', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC09', 'BMW', 'AG04', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC10', 'MINI', 'AG04', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC11', 'TESLA', 'AG05', '');
+
+insert into practicasqlgriseldavs.make_car
+(id_make_car, make_car, id_automotive_group, description)
+values('MAC12', 'LAND ROVER', 'AG06', '');
+
+
+--Cargar datos model_car
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC01', 'CAPTUR  ', 'MAC01', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC02', 'CLIO', 'MAC01', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC03', 'TOWNSTAR', 'MAC02', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC04', 'SANDERO', 'MAC03', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC05', 'AURIS', 'MAC04', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC06', 'RAV4', 'MAC04', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC07', 'BUSINESS NAVEGATION', 'MAC05', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC08', 'PEUGEOT 108', 'MAC06', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC09', 'PEUGEOT 208', 'MAC06', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC10', 'CACTUS', 'MAC07', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC11', '500', 'MAC08', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC12', '500X', 'MAC08', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC13', 'SERIE 1', 'MAC09', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC14', 'CLUBMAN', 'MAC10', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC15', 'MODEL Y', 'MAC11', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC16', 'DEFENDER', 'MAC12', '');
+
+insert into practicasqlgriseldavs.model_car
+(id_model_car , model_car, id_make_car, description)
+values('MOC17', 'DISCOVERY', 'MAC12', '');
+
+--Cargar datos model_car_KC
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR01', 'MOC01', 'YP02','TYPE01', 'CLS02', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR02', 'MOC02', 'YP02','TYPE04', 'CLS01', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR03', 'MOC03', 'YP05','TYPE01', 'CLS03', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR04', 'MOC04', 'YP06','TYPE02', 'CLS01', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR05', 'MOC04', 'YP06','TYPE02', 'CLS01', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR06', 'MOC04', 'YP06','TYPE02', 'CLS01', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR07', 'MOC04', 'YP06','TYPE02', 'CLS01', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR08', 'MOC05', 'YP01','TYPE01', 'CLS02', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR09', 'MOC06', 'YP01','TYPE01', 'CLS02', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR10', 'MOC07', 'YP04','TYPE02', 'CLS03', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR11', 'MOC08', 'YP02','TYPE02', 'CLS01', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR12', 'MOC09', 'YP02','TYPE02', 'CLS01', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR13', 'MOC10', 'YP05','TYPE04', 'CLS02', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR14', 'MOC11', 'YP04','TYPE01', 'CLS01', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR15', 'MOC12', 'YP07','TYPE04', 'CLS03', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR16', 'MOC13', 'YP04','TYPE02', 'CLS02', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR17', 'MOC14', 'YP09','TYPE04', 'CLS02', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR18', 'MOC15', 'YP06','TYPE03', 'CLS03', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR19', 'MOC16', 'YP03','TYPE03', 'CLS02', '');
+
+insert into practicasqlgriseldavs.model_car_KC
+(id_car, id_model_car, id_year_production, id_type_g, id_class_g, description)
+values('ICAR20', 'MOC17', 'YP03','TYPE03', 'CLS02', '');
+
+
+--Crear tabla reason
+
+create table practicasqlgriseldavs.reason(
+	id_reason varchar (20) not null, --PK
+	reason varchar (500) not null, 
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.reason
+add constraint reason_PK primary key (id_reason);
+
+--Crear tabla active_car
+
+create table practicasqlgriseldavs.active_car(
+	id_car varchar (20) not null, --PK, FK--car_KC--id_car
+	dt_entry date not null, --PK
+	dt_leaving date not null default '4000-01-01',
+	id_reason_start varchar (200) not null, --FK--reason---id_reason
+	id_reason_leaving varchar (200) not null, --FK--reason---id_reason
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.active_car
+add constraint active_car_PK primary key (id_car, dt_entry);
+
+alter table practicasqlgriseldavs.active_car
+add constraint active_car_id_car_id_FK foreign key (id_car)
+references practicasqlgriseldavs.car_KC(id_car);
+
+alter table practicasqlgriseldavs.active_car
+add constraint active_car_id_reason_start_FK foreign key (id_reason_start)
+references practicasqlgriseldavs.reason(id_reason);
+
+alter table practicasqlgriseldavs.active_car
+add constraint active_car_id_reason_leaving_FK foreign key (id_reason_leaving)
+references practicasqlgriseldavs.reason(id_reason);
+
+--Crear tabla check_car
+
+create table practicasqlgriseldavs.check_car(
+	id_check varchar (20) not null, --PK
+	check_car varchar (500) not null, 
+	description varchar (500) null
+);
+alter table practicasqlgriseldavs.check_car
+add constraint check_car_PK primary key (id_check);
+
+--Crear tabla currency
+create table practicasqlgriseldavs.currency(
+	id_currency varchar (20) not null, --PK
+	currency varchar (500) not null, 
+	description varchar (500) null
+);
+alter table practicasqlgriseldavs.currency
+add constraint currency_PK primary key (id_currency);
+
+--Creat tabla hist_car_check
+
+create table practicasqlgriseldavs.hist_car_check(
+	id_car varchar (20) not null, --PK, FK--car_KC--id_car
+	dt_entry date not null, --PK, FK--active_car--dt_entry
+	dt_check date not null, --PK
+	id_check varchar (20) not null, ---FK--chack_car--id_check
+	amount integer not null, 
+	currency varchar (500) not null, --FK--currency--id_currency
+	km_check_total integer not null, 
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.hist_car_check
+add constraint hist_car_check_PK primary key (id_car, dt_entry, dt_check);
+
+alter table practicasqlgriseldavs.hist_car_check
+add constraint hist_car_check_id_car_id_FK foreign key (id_car, dt_entry)
+references practicasqlgriseldavs.active_car(id_car, dt_entry);
+
+alter table practicasqlgriseldavs.hist_car_check
+add constraint hist_car_check_currency_FK foreign key (currency)
+references practicasqlgriseldavs.currency(id_currency);
+
+alter table practicasqlgriseldavs.hist_car_check
+add constraint hist_car_check_car_check_FK foreign key (id_check)
+references practicasqlgriseldavs.check_car(id_check);
+
+
+--Crear tabla type_insurance
+
+create table practicasqlgriseldavs.type_insurance(
+	id_type_insurance varchar (20) not null, --PK
+	insurance varchar (500) not null, 
+	description varchar (500) null
+);
+alter table practicasqlgriseldavs.type_insurance
+add constraint type_insurance_PK primary key (id_type_insurance);
+
+--Crear tabla insurance_company
+create table practicasqlgriseldavs.insurance_company(
+	id_insurance_company varchar (20) not null, --PK
+	company varchar (500) not null, 
+	description varchar (500) null
+);
+alter table practicasqlgriseldavs.insurance_company
+add constraint insurance_company_PK primary key (id_insurance_company);
+
+--Crear tabla hist_insurance
+
+create table practicasqlgriseldavs.hist_insurance(
+	id_car varchar (20) not null, --PK, FK--active_car--id_car
+	dt_entry date not null, --PK, FK--active_car--dt_entry
+	dt_entry_insurance date not null, --PK
+	id_insurance_company varchar (20) not null, ---FK--insurance_company--id_insurance_company
+	id_type_insurance varchar (20) not null, --FK--type_insurance--id_type_insurance
+	coverage_number varchar(500) not null, 
+	description varchar (500) null
+);
+
+alter table practicasqlgriseldavs.hist_insurance
+add constraint hist_insurance_PK primary key (id_car, dt_entry, dt_entry_insurance);
+
+alter table practicasqlgriseldavs.hist_insurance
+add constraint hist_insurance_id_car_FK foreign key (id_car, dt_entry)
+references practicasqlgriseldavs.active_car(id_car, dt_entry);
+
+alter table practicasqlgriseldavs.hist_insurance
+add constraint hist_insurance_insurance_company_FK foreign key (id_insurance_company)
+references practicasqlgriseldavs.insurance_company(id_insurance_company);
+
+alter table practicasqlgriseldavs.hist_insurance
+add constraint hist_insurance_type_insurance_FK foreign key (id_type_insurance)
+references practicasqlgriseldavs.type_insurance(id_type_insurance);
+
+
+--DML active_car
+
+--Cargar datos reason
+
+insert into practicasqlgriseldavs.reason
+(id_reason, reason, description)
+values ('RE01', 'available', '');
+
+insert into practicasqlgriseldavs.reason
+(id_reason, reason, description)
+values ('RE02', 'broken', '');
+
+
+insert into practicasqlgriseldavs.reason
+(id_reason, reason, description)
+values ('RE03', 'repair', '');
+
+
+insert into practicasqlgriseldavs.reason
+(id_reason, reason, description)
+values ('RE04', 'no reason', '');
+
+--Cargar datos active_car
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR01', '2015-08-06', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR02', '2016-01-02', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR03', '2019-10-12', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR04', '2019-03-04', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR05', '2020-12-04', '4000-01-01', 'RE01', 'RE02', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR06', '2020-08-04', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR07', '2020-08-04', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR08', '2011-10-14', '4000-01-01', 'RE01', 'RE03', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR09', '2011-07-14', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR10', '2018-08-20', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR11', '2015-06-05', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR12', '2015-11-10', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR13', '2019-06-25', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR14', '2018-11-16', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR15', '2021-12-20', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR16', '2018-08-01', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR17', '2022-11-15', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR18', '2020-09-20', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR19', '2017-08-16', '4000-01-01', 'RE01', 'RE04', '');
+
+insert into practicasqlgriseldavs.active_car
+(id_car, dt_entry, dt_leaving, id_reason_start, id_reason_leaving, description)
+values ('ICAR20', '2017-06-20', '4000-01-01', 'RE01', 'RE04', '');
+
+--Cargar datos type_insurance
+
+insert into practicasqlgriseldavs.type_insurance
+(id_type_insurance, insurance, description)
+values ('IN01', 'comprehensive insurance', '');
+
+insert into practicasqlgriseldavs.type_insurance
+(id_type_insurance, insurance, description)
+values ('IN02', 'standard', '');
+
+insert into practicasqlgriseldavs.type_insurance
+(id_type_insurance, insurance, description)
+values ('IN03', 'third-party insurance', '');
+
+--Cargar datos insurance_company
+
+insert into practicasqlgriseldavs.insurance_company
+(id_insurance_company, company, description)
+values ('ICO01', 'LA CAIXA', '');
+
+insert into practicasqlgriseldavs.insurance_company
+(id_insurance_company, company, description)
+values ('ICO02', 'MAPFRE', '');
+
+insert into practicasqlgriseldavs.insurance_company
+(id_insurance_company, company, description)
+values ('ICO03', 'ZURICH', '');
+
+insert into practicasqlgriseldavs.insurance_company
+(id_insurance_company, company, description)
+values ('ICO04', 'ALLIANZ', '');
+
+--Cargar datos currency
+
+insert into practicasqlgriseldavs.currency
+(id_currency, currency, description)
+values ('CU01', 'EUR', '');
+
+insert into practicasqlgriseldavs.currency
+(id_currency, currency, description)
+values ('CU02', 'DOLLAR', '');
+
+insert into practicasqlgriseldavs.currency
+(id_currency, currency, description)
+values ('CU03', 'YUAN', '');
+
+insert into practicasqlgriseldavs.currency
+(id_currency, currency, description)
+values ('CU04', 'GBP', '');
+
+--Cargar datos currency
+
+insert into practicasqlgriseldavs.check_car
+(id_check, check_car, description)
+values ('CH01', 'Vehicle inspection', '');
+
+
+insert into practicasqlgriseldavs.check_car
+(id_check, check_car, description)
+values ('CH02', 'Car breakdown', '');
+
+
+insert into practicasqlgriseldavs.check_car
+(id_check, check_car, description)
+values ('CH03', 'Standard inspection', '');
+
+--Cargar datos hist_car_check
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR01', '2015-08-06', '2016-08-06', 'CH01', 100, 'CU01', 100000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR02', '2016-01-02', '2017-01-02', 'CH01', 100, 'CU01', 240000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR03', '2019-10-12', '2020-10-12', 'CH01', 100, 'CU01', 500000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR04', '2019-03-04', '2020-03-04', 'CH01', 100, 'CU01', 321000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR05', '2020-12-04', '2021-12-04', 'CH02', 200, 'CU01', 200000, '');
+
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR06', '2020-08-04', '2021-08-04', 'CH01', 100, 'CU01', 100000, '');
+
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR07', '2020-08-04', '2021-08-04', 'CH01', 100, 'CU01', 200000, '');
+
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR08', '2011-10-14', '2013-10-14', 'CH02', 500, 'CU02', 300000, '');
+
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR09', '2011-07-14', '2012-07-14', 'CH01', 100, 'CU01', 100000, '');
+
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR10', '2018-08-20', '2019-08-20', 'CH01', 100, 'CU01', 150000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR11', '2015-06-05', '2016-06-05', 'CH01', 100, 'CU01', 230000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR12', '2015-11-10', '2016-11-10', 'CH01', 100, 'CU01', 50000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR13', '2019-06-25', '2020-06-25', 'CH01', 100, 'CU01', 32000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR14', '2018-11-16', '2019-11-16', 'CH01', 100, 'CU01', 10000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR15', '2021-12-20', '2022-12-20', 'CH01', 100, 'CU01', 100000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR16', '2018-08-01', '2019-08-01', 'CH01', 100, 'CU01', 150000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR17', '2022-11-15', '2022-12-15', 'CH03', 200, 'CU03', 150000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR18', '2020-09-20', '2021-09-20', 'CH03', 200, 'CU03', 120000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR19', '2017-08-16', '2018-08-16', 'CH03', 200, 'CU04', 100000, '');
+
+insert into practicasqlgriseldavs.hist_car_check
+(id_car, dt_entry, dt_check, id_check, amount, currency, km_check_total, description)
+values ('ICAR20', '2017-06-20', '2018-06-20', 'CH03', 200, 'CU04', 110000, '');
+
+
+--Cargar datos hist_insurance
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR01', '2015-08-06', '2015-06-06', 'ICO01', 'IN03', '234500012', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR02', '2016-01-02', '2015-12-25', 'ICO01', 'IN03', '948395012', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR03', '2019-10-12', '2019-08-15', 'ICO02', 'IN03', '193049203', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR04', '2019-03-04', '2019-01-10', 'ICO02', 'IN03', '630294856', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR05', '2020-12-04', '2020-10-06', 'ICO02', 'IN03', '327847280', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR06', '2020-08-04', '2020-06-15', 'ICO02', 'IN03', '938973875', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR07', '2020-08-04', '2020-07-20', 'ICO02', 'IN03', '879989333', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR08', '2011-10-14', '2011-09-16', 'ICO03', 'IN02', '212394856', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR09', '2011-07-14', '2011-06-16', 'ICO03', 'IN02', '829782937', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR10', '2018-08-20', '2018-11-25', 'ICO03', 'IN03', '983746567', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR11', '2015-06-05', '2015-04-10', 'ICO03', 'IN02', '233485746', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR12', '2015-11-10', '2015-09-12', 'ICO03', 'IN02', '545749321', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR13', '2019-06-25', '2019-05-26', 'ICO04', 'IN03', '459687940', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR14', '2018-11-16', '2018-10-17', 'ICO04', 'IN03', '499485737', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR15', '2021-12-20', '2021-12-19', 'ICO04', 'IN03', '485876739', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR16', '2018-08-01', '2018-07-26', 'ICO04', 'IN03', '348596847', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR17', '2022-11-15', '2022-11-11', 'ICO01', 'IN01', '948375648', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR18', '2020-09-20', '2020-09-18', 'ICO01', 'IN01', '439485764', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR19', '2017-08-16', '2017-08-16', 'ICO01', 'IN01', '348576894', '');
+
+insert into practicasqlgriseldavs.hist_insurance
+(id_car, dt_entry, dt_entry_insurance, id_insurance_company, id_type_insurance, coverage_number, description)
+values('ICAR20', '2017-06-20', '2017-06-20', 'ICO01', 'IN01', '295867500', '');
