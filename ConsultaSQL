@@ -1,0 +1,26 @@
+--Consulta SQL
+
+select mck.id_car, mc.model_car, mc2.make_car, ag.automotive_group, ck.dt_purchase, np.number_plate, c.color, 
+hcc.km_check_total, hi.coverage_number, ic.company
+
+from practicasqlgriseldavs.model_car_kc mck 
+join practicasqlgriseldavs.model_car mc 
+on mck.id_model_car = mc.id_model_car
+join practicasqlgriseldavs.make_car mc2 
+on mc.id_make_car = mc2.id_make_car
+join practicasqlgriseldavs.automotive_group ag 
+on mc2.id_automotive_group = ag.id_automotive_group
+join practicasqlgriseldavs.car_kc ck 
+on mck.id_car = ck.id_car 
+join practicasqlgriseldavs.number_plate np 
+on ck.id_number_plate = np.id_number_plate
+join practicasqlgriseldavs.color c 
+on ck.id_color = c.id_color
+join practicasqlgriseldavs.active_car ac 
+on ck.id_car = ac.id_car 
+join practicasqlgriseldavs.hist_car_check hcc 
+on ac.id_car = hcc.id_car and ac.dt_entry = hcc.dt_entry
+join practicasqlgriseldavs.hist_insurance hi 
+on ac.id_car = hi.id_car and ac.dt_entry = hi.dt_entry
+join practicasqlgriseldavs.insurance_company ic 
+on hi.id_insurance_company  = ic.id_insurance_company 
